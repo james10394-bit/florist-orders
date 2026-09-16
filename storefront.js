@@ -143,5 +143,30 @@ window.addEventListener('message', event => {
     $('formStatus').textContent = data.message || '送出失敗，請稍後再試。';
   }
 });
+let iframeSubmissionPending = false;
+
+form.addEventListener('submit', () => {
+  iframeSubmissionPending = $('submitOrder').disabled;
+});
+
+$('orderResultFrame').addEventListener('load', () => {
+  if (!iframeSubmissionPending) return;
+  iframeSubmissionPending = false;
+
+  window.setTimeout(() => {
+    if (!$('submitOrder').disabled) return;
+
+    $('submitOrder').disabled = false;
+    $('formStatus').textContent = '';
+    $('successId').textContent = $('orderId').value;
+    $('success').hidden = false;
+
+    form.reset();
+    $('product').value = '花藝師客製';
+    $('unitPrice').value = '0';
+    $('selectedProduct').value = '花藝師客製';
+    updateEstimate();
+  }, 500);
+});
 
 $('closeSuccess').addEventListener('click', () => $('success').hidden = true);
