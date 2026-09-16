@@ -1,4 +1,4 @@
-# 隅花相識 Amor Flores Design｜雲端商品後台＋顧客預訂 v2.2.0
+# 隅花相識 Amor Flores Design｜照片上傳後台＋顧客預訂 v2.3.0
 
 `index.html` 是精品花店顧客端，`admin.html` 是雲端後台入口，`offline-admin.html` 保留原本的離線訂單工具。顧客端支援現成商品與客製花禮、手機預訂、配送資料與卡片文字，並可透過 Google Apps Script 後端寫入 Google 試算表及專用行事曆。
 
@@ -31,6 +31,16 @@
 - 圖片網址須為公開的 HTTPS 網址。Google Drive 圖片可貼分享網址，但分享權限必須設為「知道連結的任何人都可查看」。
 - 商品資料公開給顧客網站讀取，但訂單與顧客資料仍保留在私人試算表中。
 - 網站每 2 分鐘讀取一次商品；後端快取最長 60 秒，重新整理網頁即可再次載入。
+
+## 後台直接上傳照片（v2.3）
+
+1. 將新版 `flower-orders-backend.gs` 完整貼回原本的 Apps Script 專案並儲存。
+2. 在函式選單選擇 `setupPhotoUpload`，執行一次並完成 Google Drive 權限授權。
+3. 從執行記錄複製「管理金鑰」並安全保存；不要把金鑰貼進公開 GitHub。
+4. 以「部署 → 管理部署作業 → 編輯 → 新版本」更新原本的網頁應用程式，原 `/exec` 網址保持不變。
+5. 更新 GitHub 的 `admin.html`，開啟 `admin.html` 後輸入管理金鑰、選擇商品與照片，即可上傳並自動更新商品圖片。
+
+照片會存入 Google Drive 的「隅花相識｜商品照片」資料夾。支援 JPG、PNG、WebP、HEIC、HEIF，單張上限 8 MB。管理金鑰只保存在目前瀏覽器分頁；若金鑰外洩，請在 Apps Script 執行 `rotatePhotoUploadKey`，舊金鑰會立即失效。
 
 ## 功能
 
