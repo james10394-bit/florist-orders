@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="花束與花禮線上預訂，依用途、色系、預算快速挑選，支援門市取貨與配送。">
+  <title>花日子｜花束與花禮預訂</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="storefront.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="回到首頁"><span>花日子</span><small>FLORAL ATELIER</small></a>
+    <nav aria-label="主要選單"><a href="#collection">人氣花禮</a><a href="#custom">客製流程</a><a href="#order">立即預訂</a></nav>
+    <a class="nav-cta" href="#order">開始選花</a>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">FLOWERS FOR EVERY MOMENT</p>
+        <h1>把想說的話，<br>交給花替你說。</h1>
+        <p class="lead">挑一束現成設計，或告訴我們對方的故事。從色系、預算到送達時段，一次完成預訂。</p>
+        <div class="hero-actions"><a class="primary" href="#collection">挑選花束</a><a class="secondary" href="#custom">我要客製</a></div>
+        <ul class="trust"><li>台灣在地花材</li><li>花藝師搭配</li><li>訂單行事曆追蹤</li></ul>
+      </div>
+      <div class="hero-art" aria-label="粉白花束插畫">
+        <div class="sun"></div><div class="stem s1"></div><div class="stem s2"></div><div class="stem s3"></div>
+        <div class="bloom b1">✿</div><div class="bloom b2">✽</div><div class="bloom b3">❀</div><div class="leaf l1"></div><div class="leaf l2"></div>
+        <div class="ribbon">FOR YOU</div>
+      </div>
+    </section>
+
+    <section class="occasion-strip" aria-label="常見送花用途">
+      <span>生日祝福</span><span>紀念日</span><span>告白求婚</span><span>開幕喬遷</span><span>畢業花禮</span><span>日常驚喜</span>
+    </section>
+
+    <section class="section" id="collection">
+      <div class="section-head"><div><p class="eyebrow">CURATED COLLECTION</p><h2>本週人氣花禮</h2></div><p>價格透明、快速選擇；實際花材依當週供應，以同色系與相近質感替代。</p></div>
+      <div class="filters" role="group" aria-label="商品篩選"><button class="active" data-filter="all">全部</button><button data-filter="birthday">生日</button><button data-filter="love">告白／紀念</button><button data-filter="opening">開幕</button><button data-filter="daily">日常</button></div>
+      <div class="products" id="products">
+        <article class="product" data-tags="birthday love daily" data-name="晨光粉玫花束" data-price="1680"><div class="product-art blush"><span>❀</span><span>✿</span><span>❁</span></div><div class="product-body"><div><p>柔粉・奶油白</p><h3>晨光粉玫花束</h3></div><strong>NT$1,680</strong><button>選這束</button></div></article>
+        <article class="product" data-tags="love" data-name="炙熱紅玫花束" data-price="2280"><div class="product-art rouge"><span>✿</span><span>❀</span><span>✽</span></div><div class="product-body"><div><p>酒紅・裸粉</p><h3>炙熱紅玫花束</h3></div><strong>NT$2,280</strong><button>選這束</button></div></article>
+        <article class="product" data-tags="birthday daily" data-name="小太陽鮮花束" data-price="1380"><div class="product-art sunshine"><span>✺</span><span>✿</span><span>❀</span></div><div class="product-body"><div><p>橙黃・嫩綠</p><h3>小太陽鮮花束</h3></div><strong>NT$1,380</strong><button>選這束</button></div></article>
+        <article class="product" data-tags="opening" data-name="森系開幕盆花" data-price="3200"><div class="product-art forest"><span>❈</span><span>✽</span><span>❁</span></div><div class="product-body"><div><p>白綠・大器層次</p><h3>森系開幕盆花</h3></div><strong>NT$3,200</strong><button>選這款</button></div></article>
+        <article class="product" data-tags="birthday love daily" data-name="暮色紫霧花束" data-price="1980"><div class="product-art violet"><span>❀</span><span>✾</span><span>✿</span></div><div class="product-body"><div><p>霧紫・藕粉</p><h3>暮色紫霧花束</h3></div><strong>NT$1,980</strong><button>選這束</button></div></article>
+        <article class="product custom-card" data-tags="birthday love opening daily" data-name="花藝師客製" data-price="0"><div class="custom-inner"><span>＋</span><h3>找不到剛好的？</h3><p>告訴我們用途、預算與色系，讓花藝師為你設計。</p><button>開始客製</button></div></article>
+      </div>
+    </section>
+
+    <section class="custom-flow" id="custom">
+      <div><p class="eyebrow">BESPOKE FLOWERS</p><h2>四步完成專屬花禮</h2></div>
+      <ol><li><b>01</b><span><strong>選擇用途</strong>生日、紀念或一份日常心意</span></li><li><b>02</b><span><strong>設定預算</strong>依預算安排花材與份量</span></li><li><b>03</b><span><strong>決定風格</strong>色系、禁忌與卡片文字</span></li><li><b>04</b><span><strong>安排交付</strong>選日期、時段與取貨配送</span></li></ol>
+    </section>
+
+    <section class="order-section" id="order">
+      <div class="order-intro"><p class="eyebrow">ORDER REQUEST</p><h2>預訂你的花</h2><p>送出後系統會把需求排入店家行事曆。店家確認花材、檔期與付款後，訂單才正式成立。</p><div class="notice"><strong>溫馨提醒</strong><span>急單、特殊節日與大量訂購，建議先透過 LINE 確認檔期。</span></div></div>
+      <form id="orderForm" method="post" target="orderResultFrame" novalidate>
+        <input type="hidden" name="orderId" id="orderId">
+        <input type="hidden" name="product" id="product" value="花藝師客製">
+        <input type="hidden" name="unitPrice" id="unitPrice" value="0">
+        <input class="honeypot" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <fieldset><legend><span>1</span>選擇內容</legend><div class="grid two"><label>已選商品<input id="selectedProduct" value="花藝師客製" readonly></label><label>數量 *<input name="quantity" id="quantity" type="number" min="1" max="20" value="1" required></label><label>用途 *<select name="occasion" required><option value="">請選擇</option><option>生日</option><option>告白／求婚</option><option>紀念日</option><option>開幕／喬遷</option><option>畢業</option><option>探病</option><option>告別追思</option><option>日常心意</option><option>其他</option></select></label><label>客製預算<select name="budget"><option value="">現成商品依標示價格</option><option>NT$1,000 以下</option><option>NT$1,000–1,499</option><option>NT$1,500–1,999</option><option>NT$2,000–2,999</option><option>NT$3,000–4,999</option><option>NT$5,000 以上</option></select></label><label>希望色系 *<select name="colors" required><option value="">請選擇</option><option>粉色系</option><option>紅色系</option><option>橙黃色系</option><option>紫色系</option><option>白綠色系</option><option>藍色系</option><option>繽紛混色</option><option>交由花藝師搭配</option></select></label><label>避免花材／色系<input name="avoid" placeholder="沒有可留空"></label></div></fieldset>
+        <fieldset><legend><span>2</span>交付安排</legend><div class="grid two"><label>交付方式 *<select name="method" id="method" required><option>門市取貨</option><option>店家配送</option></select></label><label>取貨／配送日期 *<input name="deliveryDate" id="deliveryDate" type="date" required></label><label>希望時段 *<select name="slot" required><option>上午 09:00–12:00</option><option>下午 12:00–15:00</option><option>下午 15:00–18:00</option><option>晚上 18:00–21:00</option></select></label><label>配送地址<input name="address" id="address" placeholder="配送時必填完整地址"></label><label>收件人姓名<input name="recipientName" id="recipientName"></label><label>收件人電話<input name="recipientPhone" id="recipientPhone" inputmode="tel"></label></div></fieldset>
+        <fieldset><legend><span>3</span>聯絡與心意</legend><div class="grid two"><label>訂購人姓名 *<input name="customerName" required></label><label>訂購人電話 *<input name="customerPhone" inputmode="tel" pattern="[0-9+()\-\s]{8,20}" required></label><label>電子郵件<input name="email" type="email"></label><label>希望聯絡方式 *<select name="contact" required><option>LINE</option><option>電話</option><option>電子郵件</option></select></label><label class="full">卡片文字<textarea name="card" placeholder="請確認人名與文字是否正確"></textarea></label><label class="full">其他需求<textarea name="notes" placeholder="指定花材、驚喜安排、送達前聯絡方式等"></textarea></label></div><label class="agree"><input type="checkbox" required>我了解送出表單不代表訂單成立，仍須等待店家確認及完成付款。</label></fieldset>
+        <div class="checkout"><div><small>預估商品金額</small><strong id="estimate">客製報價</strong></div><button type="submit" id="submitOrder">送出預訂需求 <span>→</span></button></div>
+        <p class="form-status" id="formStatus" role="status"></p>
+      </form>
+      <iframe name="orderResultFrame" id="orderResultFrame" title="送單結果" hidden></iframe>
+    </section>
+  </main>
+
+  <footer><div class="brand"><span>花日子</span><small>FLORAL ATELIER</small></div><p>花材會隨季節與市場供應調整；設計師將維持色系、質感與價值相近。</p><a href="admin.html" rel="nofollow">店家後台</a></footer>
+  <div class="success" id="success" hidden><div><span>✓</span><h2>預訂需求已送出</h2><p>訂單編號：<b id="successId"></b></p><p>店家確認花材、檔期與付款後，會再與你聯絡。</p><button id="closeSuccess">完成</button></div></div>
+  <script src="storefront.js"></script>
+</body>
+</html>
