@@ -7,7 +7,7 @@ window.AMOR_CONFIG = Object.freeze({
   orderApi: 'https://script.google.com/macros/s/AKfycbwfAUnpAgc54KDfvpmbQsomUpfBZ0wve0v6ad3fLFgiN7NZ0eh2UdPziDFrzJL-LYka/exec',
 
   // setupFlowerBackend 執行記錄顯示的 Google 試算表網址。
-  adminSheetUrl: '',
+  adminSheetUrl: 'https://docs.google.com/spreadsheets/d/148vwIZXG8HnB5yQStNhMz47EVplQd6tdHXX345OUIow/edit?gid=0#gid=0',
 
   instagramUrl: 'https://www.instagram.com/amorflores2018/',
   productRefreshMs: 120000,
