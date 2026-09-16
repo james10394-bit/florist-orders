@@ -1,5 +1,5 @@
 /**
- * 隅花相識 Amor Flores Design 顧客預訂後端 v2.1.0
+ * 隅花相識 Amor Flores Design 顧客預訂＋商品後端 v2.2.0
  * 執行 setupFlowerBackend() 一次，再「部署 → 新增部署 → 網頁應用程式」。
  * 執行身分：我；存取權：任何人。
  */
@@ -15,20 +15,100 @@ function setupFlowerBackend() {
     const calendar = CalendarApp.createCalendar(SHOP.calendarName, {timeZone: SHOP.timezone});
     props.setProperty('CALENDAR_ID', calendar.getId());
   }
+  let sheetFile;
   if (!props.getProperty('SHEET_ID')) {
-    const sheetFile = SpreadsheetApp.create(SHOP.sheetName);
-    const sheet = sheetFile.getSheets()[0];
-    sheet.setName('訂單');
-    sheet.appendRow(['建立時間','訂單編號','狀態','商品','單價','數量','預算','用途','色系','避免花材','交付方式','交付日期','時段','訂購人','訂購人電話','Email','聯絡方式','收件人','收件人電話','地址','卡片','備註','日曆事件ID']);
-    sheet.setFrozenRows(1);
+    sheetFile = SpreadsheetApp.create(SHOP.sheetName);
     props.setProperty('SHEET_ID', sheetFile.getId());
+  } else {
+    sheetFile = SpreadsheetApp.openById(props.getProperty('SHEET_ID'));
   }
+  ensureOrdersSheet_(sheetFile);
+  ensureProductsSheet_(sheetFile);
   console.log('後端已準備完成。接著請部署為網頁應用程式。');
   console.log('試算表：https://docs.google.com/spreadsheets/d/' + props.getProperty('SHEET_ID'));
 }
 
-function doGet() {
+function doGet(e) {
+  if (e && e.parameter && e.parameter.action === 'catalog') {
+    return catalogResponse_(e.parameter.callback);
+  }
   return HtmlService.createHtmlOutput('隅花相識 Amor Flores Design 訂單後端運作中');
+}
+
+function ensureOrdersSheet_(sheetFile) {
+  let sheet = sheetFile.getSheetByName('訂單');
+  if (!sheet) {
+    sheet = sheetFile.getSheets()[0];
+    if (sheet.getLastRow() === 0) sheet.setName('訂單');
+    else sheet = sheetFile.insertSheet('訂單');
+  }
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(['建立時間','訂單編號','狀態','商品','單價','數量','預算','用途','色系','避免花材','交付方式','交付日期','時段','訂購人','訂購人電話','Email','聯絡方式','收件人','收件人電話','地址','卡片','備註','日曆事件ID']);
+    sheet.setFrozenRows(1);
+  }
+}
+
+function ensureProductsSheet_(sheetFile) {
+  let sheet = sheetFile.getSheetByName('商品');
+  if (sheet) return;
+  sheet = sheetFile.insertSheet('商品');
+  sheet.appendRow(['上架','排序','商品名稱','副標','價格','分類','圖片網址','按鈕文字']);
+  sheet.getRange(2, 1, 5, 8).setValues([
+    [true,1,'晨光粉玫花束','柔粉・奶油白',1680,'生日、告白／紀念、日常','','選這束'],
+    [true,2,'炙熱紅玫花束','酒紅・裸粉',2280,'告白／紀念','','選這束'],
+    [true,3,'小太陽鮮花束','橙黃・嫩綠',1580,'生日、日常','','選這束'],
+    [true,4,'森系開幕盆花','白綠・大器層次',3200,'開幕','','選這款'],
+    [true,5,'暮色紫霧花束','霧紫・藕粉',1980,'生日、告白／紀念、日常','','選這束'],
+  ]);
+  sheet.getRange('A2:A1000').insertCheckboxes();
+  sheet.setFrozenRows(1);
+  sheet.autoResizeColumns(1, 8);
+}
+
+function catalogResponse_(callback) {
+  const callbackName = String(callback || 'renderFlowerCatalog');
+  if (!/^[A-Za-z_$][0-9A-Za-z_$\.]{0,80}$/.test(callbackName)) {
+    return ContentService.createTextOutput('/* invalid callback */')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
+
+  const cache = CacheService.getScriptCache();
+  let json = cache.get('PUBLIC_PRODUCT_CATALOG');
+  if (!json) {
+    const props = PropertiesService.getScriptProperties();
+    const sheet = SpreadsheetApp.openById(props.getProperty('SHEET_ID')).getSheetByName('商品');
+    if (!sheet) throw new Error('找不到商品分頁，請再執行一次 setupFlowerBackend。');
+    const rows = sheet.getDataRange().getDisplayValues();
+    const headers = rows.shift();
+    const column = {};
+    headers.forEach(function(header, index) { column[header] = index; });
+    const products = rows.map(function(row) {
+      const enabled = String(row[column['上架']] || '').toUpperCase();
+      if (!['TRUE','是','Y','YES','1','上架'].includes(enabled)) return null;
+      return {
+        order: Number(row[column['排序']]) || 9999,
+        name: String(row[column['商品名稱']] || '').trim(),
+        subtitle: String(row[column['副標']] || '').trim(),
+        price: Number(String(row[column['價格']] || '').replace(/[^0-9.]/g, '')) || 0,
+        category: String(row[column['分類']] || '').trim(),
+        imageUrl: normalizeImageUrl_(row[column['圖片網址']]),
+        buttonText: String(row[column['按鈕文字']] || '選這束').trim(),
+      };
+    }).filter(function(product) { return product && product.name; })
+      .sort(function(a, b) { return a.order - b.order; });
+    json = JSON.stringify({ok:true,updatedAt:new Date().toISOString(),refreshSeconds:120,products:products});
+    cache.put('PUBLIC_PRODUCT_CATALOG', json, 60);
+  }
+  return ContentService.createTextOutput(callbackName + '(' + json.replace(/</g, '\\u003c') + ');')
+    .setMimeType(ContentService.MimeType.JAVASCRIPT);
+}
+
+function normalizeImageUrl_(value) {
+  const url = String(value || '').trim();
+  if (!url) return '';
+  const driveId = (url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/) || [])[1];
+  if (driveId) return 'https://drive.google.com/thumbnail?id=' + driveId + '&sz=w1200';
+  return /^https:\/\//i.test(url) ? url : '';
 }
 
 function doPost(e) {

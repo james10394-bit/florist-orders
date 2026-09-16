@@ -1,0 +1,10 @@
+.product-photo {
+  background: #eee8e2;
+}
+
+.product-photo img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}

@@ -1,12 +1,13 @@
 'use strict';
 
-// 完成 flower-orders-backend.gs 的網頁應用程式部署後，將網址貼在引號內。
-const FLOWER_ORDER_API = '';
+const FLOWER_ORDER_API = window.AMOR_CONFIG?.orderApi || '';
+const PRODUCT_REFRESH_MS = window.AMOR_CONFIG?.productRefreshMs || 120000;
 
 const $ = id => document.getElementById(id);
 const form = $('orderForm');
 const money = n => new Intl.NumberFormat('zh-TW').format(Number(n) || 0);
 
+function bindFilters() {
 document.querySelectorAll('[data-filter]').forEach(button => {
   button.addEventListener('click', () => {
     document.querySelectorAll('[data-filter]').forEach(x => x.classList.remove('active'));
@@ -17,7 +18,9 @@ document.querySelectorAll('[data-filter]').forEach(button => {
     });
   });
 });
+}
 
+function bindProductButtons() {
 document.querySelectorAll('.product button').forEach(button => {
   button.addEventListener('click', () => {
     const card = button.closest('.product');
@@ -28,6 +31,62 @@ document.querySelectorAll('.product button').forEach(button => {
     $('order').scrollIntoView({behavior: 'smooth'});
   });
 });
+}
+
+bindFilters();
+bindProductButtons();
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, character => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
+}
+
+function categoryTags(category) {
+  const map = {'生日':'birthday','告白／紀念':'love','告白':'love','紀念日':'love','開幕':'opening','日常':'daily'};
+  return String(category || '').split(/[、,，/]/).map(x => map[x.trim()] || '').filter(Boolean).join(' ') || 'birthday love opening daily';
+}
+
+function safeImageUrl(value) {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' ? url.href : '';
+  } catch {
+    return '';
+  }
+}
+
+window.renderFlowerCatalog = payload => {
+  if (!payload?.ok || !Array.isArray(payload.products) || !payload.products.length) return;
+  const palettes = ['blush','rouge','sunshine','forest','violet'];
+  const symbols = ['❀✿❁','✿❀✽','✺✿❀','❈✽❁','❀✾✿'];
+  const cards = payload.products.map((product, index) => {
+    const name = escapeHtml(product.name);
+    const subtitle = escapeHtml(product.subtitle);
+    const price = Number(product.price) || 0;
+    const image = safeImageUrl(product.imageUrl);
+    const art = image
+      ? `<div class="product-art product-photo"><img src="${escapeHtml(image)}" alt="${name}" loading="lazy"></div>`
+      : `<div class="product-art ${palettes[index % palettes.length]}">${symbols[index % symbols.length].split('').map(x => `<span>${x}</span>`).join('')}</div>`;
+    return `<article class="product" data-tags="${categoryTags(product.category)}" data-name="${name}" data-price="${price}">${art}<div class="product-body"><div><p>${subtitle}</p><h3>${name}</h3></div><strong>${price ? 'NT$' + money(price) : '另行報價'}</strong><button>${escapeHtml(product.buttonText || '選這束')}</button></div></article>`;
+  }).join('');
+  cards += '<article class="product custom-card" data-tags="birthday love opening daily" data-name="花藝師客製" data-price="0"><div class="custom-inner"><span>＋</span><h3>找不到剛好的？</h3><p>告訴我們用途、預算與色系，讓花藝師為你設計。</p><button>開始客製</button></div></article>';
+  $('products').innerHTML = cards;
+  bindProductButtons();
+  const activeFilter = document.querySelector('[data-filter].active')?.dataset.filter || 'all';
+  document.querySelectorAll('.product').forEach(card => card.hidden = activeFilter !== 'all' && !card.dataset.tags.split(' ').includes(activeFilter));
+};
+
+function loadCatalog() {
+  if (!FLOWER_ORDER_API) return;
+  document.getElementById('catalogJsonp')?.remove();
+  const script = document.createElement('script');
+  script.id = 'catalogJsonp';
+  script.src = FLOWER_ORDER_API + (FLOWER_ORDER_API.includes('?') ? '&' : '?') + 'action=catalog&callback=renderFlowerCatalog&_=' + Date.now();
+  script.onerror = () => console.warn('商品目錄暫時無法更新，保留目前商品。');
+  document.body.appendChild(script);
+}
+
+loadCatalog();
+setInterval(loadCatalog, PRODUCT_REFRESH_MS);
 
 function updateEstimate() {
   const price = Number($('unitPrice').value);
