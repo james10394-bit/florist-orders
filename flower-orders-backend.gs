@@ -1,11 +1,11 @@
 /**
- * 花店顧客預訂後端 v2.0.0
+ * 隅花相識 Amor Flores Design 顧客預訂後端 v2.1.0
  * 執行 setupFlowerBackend() 一次，再「部署 → 新增部署 → 網頁應用程式」。
  * 執行身分：我；存取權：任何人。
  */
 const SHOP = Object.freeze({
-  calendarName: '花店顧客預訂',
-  sheetName: '花店顧客預訂資料',
+  calendarName: '隅花相識｜顧客預訂',
+  sheetName: '隅花相識｜顧客預訂資料',
   timezone: 'Asia/Taipei',
 });
 
@@ -28,7 +28,7 @@ function setupFlowerBackend() {
 }
 
 function doGet() {
-  return HtmlService.createHtmlOutput('花店訂單後端運作中');
+  return HtmlService.createHtmlOutput('隅花相識 Amor Flores Design 訂單後端運作中');
 }
 
 function doPost(e) {
