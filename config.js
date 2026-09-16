@@ -4,7 +4,7 @@
  */
 window.AMOR_CONFIG = Object.freeze({
   // Apps Script 網頁應用程式網址，必須以 /exec 結尾。
-  orderApi: '',
+  orderApi: 'https://script.google.com/macros/s/AKfycbwfAUnpAgc54KDfvpmbQsomUpfBZ0wve0v6ad3fLFgiN7NZ0eh2UdPziDFrzJL-LYka/exec',
 
   // setupFlowerBackend 執行記錄顯示的 Google 試算表網址。
   adminSheetUrl: '',
