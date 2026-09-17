@@ -95,9 +95,37 @@ function updateEstimate() {
 }
 $('quantity').addEventListener('input', updateEstimate);
 
-const earliestDeliveryDate = new Date();
-earliestDeliveryDate.setDate(earliestDeliveryDate.getDate() + 3);
-$('deliveryDate').min = [earliestDeliveryDate.getFullYear(), String(earliestDeliveryDate.getMonth() + 1).padStart(2, '0'), String(earliestDeliveryDate.getDate()).padStart(2, '0')].join('-');
+const MIN_DELIVERY_LEAD_DAYS = 3;
+const deliveryDateInput = $('deliveryDate');
+
+function dateInputValue(date) {
+  return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, '0'), String(date.getDate()).padStart(2, '0')].join('-');
+}
+
+function earliestDeliveryDateValue(baseDate = new Date()) {
+  const earliest = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate(), 12);
+  earliest.setDate(earliest.getDate() + MIN_DELIVERY_LEAD_DAYS);
+  return dateInputValue(earliest);
+}
+
+function applyDeliveryDateLimit() {
+  const earliest = earliestDeliveryDateValue();
+  deliveryDateInput.min = earliest;
+  const tooSoon = deliveryDateInput.value && deliveryDateInput.value < earliest;
+  deliveryDateInput.setCustomValidity(tooSoon ? '一般訂單最早可選 3 天後；3 天內急件請聯絡花藝師 Ada。' : '');
+  return !tooSoon;
+}
+
+applyDeliveryDateLimit();
+deliveryDateInput.addEventListener('input', applyDeliveryDateLimit);
+deliveryDateInput.addEventListener('change', () => {
+  if (applyDeliveryDateLimit()) {
+    if ($('formStatus').textContent.includes('最早可選 3 天後')) $('formStatus').textContent = '';
+    return;
+  }
+  deliveryDateInput.reportValidity();
+  $('formStatus').textContent = '一般訂單最早可選 3 天後；急件請聯絡花藝師 Ada：0972-929-554。';
+});
 
 $('method').addEventListener('change', () => {
   const delivery = $('method').value === '店家配送';
@@ -105,6 +133,7 @@ $('method').addEventListener('change', () => {
 });
 
 form.addEventListener('submit', event => {
+  applyDeliveryDateLimit();
   if (!form.checkValidity()) {
     event.preventDefault();
     form.reportValidity();
