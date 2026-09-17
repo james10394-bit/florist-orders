@@ -34,7 +34,7 @@
         <div class="upload-grid">
           <label class="field"><span>管理金鑰</span><input type="password" name="adminKey" id="adminKey" autocomplete="off" placeholder="貼上 Apps Script 產生的管理金鑰" required></label>
           <label class="field"><span>套用到商品</span><select name="productName" id="productName"><option value="">只上傳，不自動套用</option></select></label>
-          <label class="field full"><span>選擇照片（最大 8 MB）</span><input type="file" id="photoFile" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" required></label>
+          <label class="field full"><span>選擇照片（原圖最大 40 MB，系統會自動最佳化）</span><input type="file" id="photoFile" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" required></label>
           <div class="preview full" id="photoPreview"><span>照片預覽</span></div>
         </div>
         <div class="actions"><button class="button" type="submit" id="uploadButton">上傳並套用照片<small>完成後網站重新整理即可查看</small></button></div>
@@ -118,30 +118,74 @@
       if(!api){setStatus('尚未設定 Google Apps Script 網址。','error');return}
       if(!key){setStatus('請輸入管理金鑰。','error');keyInput.focus();return}
       if(!file){setStatus('請先選擇照片。','error');return}
-      if(file.size>8*1024*1024){setStatus('圖片不可超過 8 MB。','error');return}
+      if(file.size>40*1024*1024){setStatus('原始照片不可超過 40 MB。','error');return}
       const allowed=['image/jpeg','image/png','image/webp','image/heic','image/heif'];
       if(!allowed.includes(file.type)){setStatus('僅支援 JPG、PNG、WebP 或 HEIC 圖片。','error');return}
 
       uploadButton.disabled=true;
       resultBox.hidden=true;
-      setStatus('正在讀取照片…');
-      const reader=new FileReader();
-      reader.onerror=()=>finishUploadError('無法讀取這張照片。');
-      reader.onload=()=>{
+      setStatus(file.size>8*1024*1024?'正在自動縮小照片，請稍候…':'正在讀取照片…');
+      optimizePhoto(file).then(optimizedFile=>fileToDataUrl(optimizedFile).then(dataUrl=>{
         const requestId='UP-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,8).toUpperCase();
         document.getElementById('uploadRequestId').value=requestId;
-        document.getElementById('uploadFileName').value=file.name||'flower-photo.jpg';
-        document.getElementById('uploadMimeType').value=file.type;
-        document.getElementById('uploadImageData').value=String(reader.result).split(',')[1]||'';
+        document.getElementById('uploadFileName').value=optimizedFile.name||'flower-photo.jpg';
+        document.getElementById('uploadMimeType').value=optimizedFile.type;
+        document.getElementById('uploadImageData').value=String(dataUrl).split(',')[1]||'';
         uploadForm.action=api;
         activeUpload={requestId:requestId,key:key,polls:0};
         try{sessionStorage.setItem('amorUploadKey',key)}catch(error){}
         setStatus('照片正在上傳，請勿關閉頁面…');
         uploadForm.submit();
         window.setTimeout(pollUploadStatus,1400);
-      };
-      reader.readAsDataURL(file);
+      })).catch(error=>finishUploadError(error.message||'無法處理這張照片。'));
     });
+
+    function fileToDataUrl(file){
+      return new Promise((resolve,reject)=>{
+        const reader=new FileReader();
+        reader.onload=()=>resolve(reader.result);
+        reader.onerror=()=>reject(new Error('無法讀取這張照片。'));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function loadLocalImage(file){
+      return new Promise((resolve,reject)=>{
+        const localUrl=URL.createObjectURL(file);
+        const image=new Image();
+        image.onload=()=>{URL.revokeObjectURL(localUrl);resolve(image)};
+        image.onerror=()=>{URL.revokeObjectURL(localUrl);reject(new Error('瀏覽器無法轉換此照片格式。'))};
+        image.src=localUrl;
+      });
+    }
+
+    function canvasToBlob(canvas,quality){
+      return new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('照片壓縮失敗。')),'image/jpeg',quality));
+    }
+
+    async function optimizePhoto(file){
+      if(file.size<=8*1024*1024)return file;
+      try{
+        const image=await loadLocalImage(file);
+        const longest=Math.max(image.naturalWidth,image.naturalHeight);
+        const scale=Math.min(1,2560/longest);
+        const canvas=document.createElement('canvas');
+        canvas.width=Math.max(1,Math.round(image.naturalWidth*scale));
+        canvas.height=Math.max(1,Math.round(image.naturalHeight*scale));
+        const context=canvas.getContext('2d');
+        context.fillStyle='#fff';
+        context.fillRect(0,0,canvas.width,canvas.height);
+        context.drawImage(image,0,0,canvas.width,canvas.height);
+        let blob=await canvasToBlob(canvas,.86);
+        if(blob.size>8*1024*1024)blob=await canvasToBlob(canvas,.72);
+        if(blob.size>20*1024*1024)throw new Error('照片最佳化後仍過大，請先裁切再上傳。');
+        const baseName=(file.name||'flower-photo').replace(/\.[^.]+$/,'');
+        return new File([blob],baseName+'-web.jpg',{type:'image/jpeg'});
+      }catch(error){
+        if(file.size<=20*1024*1024)return file;
+        throw new Error('這張大型照片無法自動轉換，請改用 JPG 或先裁切後再上傳。');
+      }
+    }
 
     function pollUploadStatus(){
       if(!activeUpload)return;

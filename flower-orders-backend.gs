@@ -1,5 +1,5 @@
 /**
- * 隅花相識 Amor Flores Design 顧客預訂＋商品後端 v2.3.0
+ * 隅花相識 Amor Flores Design 顧客預訂＋商品後端 v2.3.8
  * 執行 setupFlowerBackend() 一次，再「部署 → 新增部署 → 網頁應用程式」。
  * 執行身分：我；存取權：任何人。
  */
@@ -30,7 +30,7 @@ function setupFlowerBackend() {
 }
 
 /**
- * 升級 v2.3 後執行一次。建立商品照片資料夾與管理金鑰。
+ * 升級 v2.3.5 後執行一次。建立商品照片資料夾與管理金鑰。
  * 金鑰只會顯示在執行記錄，請勿放進公開的 GitHub 程式。
  */
 function setupPhotoUpload() {
@@ -203,7 +203,9 @@ function validate_(p) {
   if (p.method === '店家配送' && (!p.address || !p.recipientName || !p.recipientPhone)) throw new Error('配送訂單請填完整收件資料。');
   const requested = new Date(p.deliveryDate + 'T00:00:00+08:00');
   const today = new Date(Utilities.formatDate(new Date(), SHOP.timezone, 'yyyy-MM-dd') + 'T00:00:00+08:00');
-  if (requested <= today) throw new Error('交付日期至少需選擇明天。');
+  const earliest = new Date(today.getTime());
+  earliest.setDate(earliest.getDate() + 3);
+  if (requested < earliest) throw new Error('一般訂單交付日期最早需選擇 3 天後；急件請聯絡花藝師 Ada：0972-929-554。');
 }
 
 function interval_(date, slot) {
@@ -233,7 +235,7 @@ function handlePhotoUpload_(p) {
     const base64 = String(p.imageData || '').replace(/^data:[^;]+;base64,/, '').replace(/\s/g, '');
     if (!base64) throw new Error('沒有收到圖片內容。');
     const bytes = Utilities.base64Decode(base64);
-    if (bytes.length > 8 * 1024 * 1024) throw new Error('圖片不可超過 8 MB。');
+    if (bytes.length > 20 * 1024 * 1024) throw new Error('處理後的圖片不可超過 20 MB。');
 
     const props = PropertiesService.getScriptProperties();
     const folder = ensureUploadFolder_(props);

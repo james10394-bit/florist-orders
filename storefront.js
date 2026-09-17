@@ -108,14 +108,30 @@ function earliestDeliveryDateValue(baseDate = new Date()) {
   return dateInputValue(earliest);
 }
 
+function populateDeliveryDates(baseDate = new Date()) {
+  const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+  const earliest = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate(), 12);
+  earliest.setDate(earliest.getDate() + MIN_DELIVERY_LEAD_DAYS);
+  deliveryDateInput.innerHTML = '<option value="">請選擇日期</option>';
+
+  for (let dayOffset = 0; dayOffset < 365; dayOffset += 1) {
+    const date = new Date(earliest);
+    date.setDate(earliest.getDate() + dayOffset);
+    const option = document.createElement('option');
+    option.value = dateInputValue(date);
+    option.textContent = `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}（${weekdays[date.getDay()]}）`;
+    deliveryDateInput.appendChild(option);
+  }
+}
+
 function applyDeliveryDateLimit() {
   const earliest = earliestDeliveryDateValue();
-  deliveryDateInput.min = earliest;
   const tooSoon = deliveryDateInput.value && deliveryDateInput.value < earliest;
   deliveryDateInput.setCustomValidity(tooSoon ? '一般訂單最早可選 3 天後；3 天內急件請聯絡花藝師 Ada。' : '');
   return !tooSoon;
 }
 
+populateDeliveryDates();
 applyDeliveryDateLimit();
 deliveryDateInput.addEventListener('input', applyDeliveryDateLimit);
 deliveryDateInput.addEventListener('change', () => {
