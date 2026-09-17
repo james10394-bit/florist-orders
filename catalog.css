@@ -9,3 +9,9 @@
   object-fit: contain;
   object-position: center;
 }
+
+.field-note {
+  color: #8a6f63;
+  font-size: 12px;
+  line-height: 1.5;
+}

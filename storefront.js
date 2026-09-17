@@ -95,9 +95,9 @@ function updateEstimate() {
 }
 $('quantity').addEventListener('input', updateEstimate);
 
-const tomorrow = new Date();
-tomorrow.setDate(tomorrow.getDate() + 1);
-$('deliveryDate').min = [tomorrow.getFullYear(), String(tomorrow.getMonth() + 1).padStart(2, '0'), String(tomorrow.getDate()).padStart(2, '0')].join('-');
+const earliestDeliveryDate = new Date();
+earliestDeliveryDate.setDate(earliestDeliveryDate.getDate() + 3);
+$('deliveryDate').min = [earliestDeliveryDate.getFullYear(), String(earliestDeliveryDate.getMonth() + 1).padStart(2, '0'), String(earliestDeliveryDate.getDate()).padStart(2, '0')].join('-');
 
 $('method').addEventListener('change', () => {
   const delivery = $('method').value === '店家配送';
