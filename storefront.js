@@ -58,7 +58,7 @@ window.renderFlowerCatalog = payload => {
   if (!payload?.ok || !Array.isArray(payload.products) || !payload.products.length) return;
   const palettes = ['blush','rouge','sunshine','forest','violet'];
   const symbols = ['❀✿❁','✿❀✽','✺✿❀','❈✽❁','❀✾✿'];
-  const cards = payload.products.map((product, index) => {
+  let cards = payload.products.map((product, index) => {
     const name = escapeHtml(product.name);
     const subtitle = escapeHtml(product.subtitle);
     const price = Number(product.price) || 0;
