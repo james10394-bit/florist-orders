@@ -49,7 +49,7 @@
       <h2>修改商品只要四步</h2>
       <ol class="steps"><li>在上方選擇要更換照片的商品。</li><li>選取手機或電腦中的照片並上傳。</li><li>名稱、價格、分類與上下架仍可在試算表「商品」分頁修改。</li><li>網站重新整理即可讀取新資料；一般訪客最慢約 2 分鐘看到更新。</li></ol>
     </section>
-    <div class="links"><a href="index.html">← 返回顧客網站</a><a href="offline-admin.html">開啟離線訂單工具</a><a id="instagramLink" href="#" target="_blank" rel="noopener">Instagram</a></div>
+    <div class="links"><a href="index.html">← 返回顧客網站</a><a href="offline-admin.html">開啟離線訂單工具</a></div>
   </main>
   <script src="config.js"></script>
   <script>
@@ -70,7 +70,6 @@
     let activeUpload=null;
 
     if(cfg.adminSheetUrl){sheet.href=cfg.adminSheetUrl;sheet.target='_blank';sheet.rel='noopener'}else{sheet.addEventListener('click',e=>{e.preventDefault();notice.hidden=false});notice.hidden=false}
-    document.getElementById('instagramLink').href=cfg.instagramUrl||'#';
     try{keyInput.value=sessionStorage.getItem('amorUploadKey')||''}catch(error){}
 
     function setStatus(message,type=''){

@@ -7,6 +7,13 @@ const $ = id => document.getElementById(id);
 const form = $('orderForm');
 const money = n => new Intl.NumberFormat('zh-TW').format(Number(n) || 0);
 
+const instagramLink = $('storefrontInstagram');
+if (instagramLink) {
+  const instagramUrl = window.AMOR_CONFIG?.instagramUrl || '';
+  if (instagramUrl) instagramLink.href = instagramUrl;
+  else instagramLink.hidden = true;
+}
+
 function bindFilters() {
 document.querySelectorAll('[data-filter]').forEach(button => {
   button.addEventListener('click', () => {
@@ -147,6 +154,28 @@ $('method').addEventListener('change', () => {
   const delivery = $('method').value === '店家配送';
   ['address', 'recipientName', 'recipientPhone'].forEach(id => $(id).required = delivery);
 });
+
+const recipientSyncPairs = [
+  ['customerName', 'recipientName'],
+  ['customerPhone', 'recipientPhone'],
+  ['customerAddress', 'address']
+];
+
+function syncRecipientData() {
+  const enabled = $('syncRecipient').checked;
+  recipientSyncPairs.forEach(([sourceId, targetId]) => {
+    const target = $(targetId);
+    target.readOnly = enabled;
+    if (enabled) target.value = $(sourceId).value;
+  });
+}
+
+$('syncRecipient').addEventListener('change', syncRecipientData);
+recipientSyncPairs.forEach(([sourceId]) => $(sourceId).addEventListener('input', () => {
+  if ($('syncRecipient').checked) syncRecipientData();
+}));
+
+form.addEventListener('reset', () => window.setTimeout(syncRecipientData, 0));
 
 form.addEventListener('submit', event => {
   applyDeliveryDateLimit();

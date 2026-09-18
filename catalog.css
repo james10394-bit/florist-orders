@@ -29,35 +29,117 @@
   box-shadow: 0 10px 28px #66584c12;
 }
 
-.florist-contact > span {
-  color: #a98576;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .22em;
-}
-
-.florist-contact > div {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-}
-
-.florist-contact strong {
-  font-family: 'Noto Serif TC', serif;
-  font-size: 18px;
+.florist-signature {
+  color: #81675d;
+  font-family: 'Ma Shan Zheng', 'Noto Serif TC', serif;
+  font-size: 29px;
+  font-weight: 400;
+  letter-spacing: .04em;
+  line-height: 1;
+  transform: rotate(-2deg);
 }
 
 .florist-contact a {
   color: #75695f;
-  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-size: 14px;
+  font-weight: 700;
   white-space: nowrap;
-  border-bottom: 1px solid #a9857666;
+}
+
+.florist-contact a small {
+  color: #a98576;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .18em;
+}
+
+.sync-recipient {
+  flex-direction: row !important;
+  align-items: center;
+  padding: 13px 14px;
+  border: 1px solid #ded5cd;
+  border-radius: 10px;
+  background: #faf7f3;
+  cursor: pointer;
+}
+
+.sync-recipient input {
+  width: 18px;
+  height: 18px;
+  margin: 0 4px 0 0;
+  padding: 0;
+  accent-color: #a98576;
+}
+
+.sync-recipient span {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 9px;
+  color: #75695f;
+}
+
+.sync-recipient strong {
+  color: #4f453f;
+}
+
+.instagram-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  justify-self: end;
+  padding: 10px 14px;
+  border: 1px solid #ffffff38;
+  border-radius: 999px;
+  color: #fff;
+  transition: .2s ease;
+}
+
+.instagram-link:hover {
+  border-color: #fff;
+  background: #ffffff12;
+  transform: translateY(-2px);
+}
+
+.instagram-link svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+}
+
+.instagram-link .instagram-dot {
+  fill: currentColor;
+  stroke: none;
+}
+
+.instagram-link span {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: 12px;
+}
+
+.instagram-link small {
+  color: #cbd2cc;
+  font-size: 8px;
+  letter-spacing: .18em;
 }
 
 @media (max-width: 560px) {
   .florist-contact {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 7px;
+    align-items: center;
+    flex-direction: row;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 850px) {
+  .instagram-link {
+    justify-self: start;
   }
 }
