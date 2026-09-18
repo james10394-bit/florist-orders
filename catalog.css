@@ -31,12 +31,21 @@
 
 .florist-signature {
   color: #81675d;
-  font-family: 'Ma Shan Zheng', 'Noto Serif TC', serif;
+  font-family: 'Ma Shan Zheng', cursive;
   font-size: 29px;
   font-weight: 400;
-  letter-spacing: .04em;
-  line-height: 1;
-  transform: rotate(-2deg);
+  letter-spacing: 0;
+  line-height: 1.2;
+  display: inline-flex;
+  align-items: baseline;
+  gap: .18em;
+  white-space: nowrap;
+  font-synthesis: none;
+}
+
+.florist-signature span {
+  font: inherit;
+  letter-spacing: inherit;
 }
 
 .florist-contact a {
@@ -135,6 +144,11 @@
     align-items: center;
     flex-direction: row;
     gap: 12px;
+  }
+
+  .florist-signature {
+    font-size: clamp(24px, 7.4vw, 29px);
+    gap: .14em;
   }
 }
 
