@@ -8,6 +8,28 @@
   display: block;
   object-fit: contain;
   object-position: center;
+  opacity: 0;
+  transition: opacity .22s ease;
+}
+
+.product-photo img.is-loaded {
+  opacity: 1;
+}
+
+.product-photo::before {
+  content: '圖片載入中';
+  position: absolute;
+  color: #9a8d83;
+  font-size: 12px;
+  letter-spacing: .08em;
+}
+
+.product-photo:has(img.is-loaded)::before {
+  display: none;
+}
+
+.product-photo {
+  position: relative;
 }
 
 .field-note {
@@ -34,18 +56,11 @@
   font-family: 'Ma Shan Zheng', cursive;
   font-size: 29px;
   font-weight: 400;
-  letter-spacing: 0;
+  letter-spacing: .04em;
   line-height: 1.2;
-  display: inline-flex;
-  align-items: baseline;
-  gap: .18em;
+  display: inline-block;
   white-space: nowrap;
   font-synthesis: none;
-}
-
-.florist-signature span {
-  font: inherit;
-  letter-spacing: inherit;
 }
 
 .florist-contact a {
@@ -148,7 +163,6 @@
 
   .florist-signature {
     font-size: clamp(24px, 7.4vw, 29px);
-    gap: .14em;
   }
 }
 

@@ -2,6 +2,8 @@
 
 const FLOWER_ORDER_API = window.AMOR_CONFIG?.orderApi || '';
 const PRODUCT_REFRESH_MS = window.AMOR_CONFIG?.productRefreshMs || 120000;
+const PRODUCT_CACHE_KEY = 'amor-flower-catalog-v2';
+let lastCatalogSignature = '';
 
 const $ = id => document.getElementById(id);
 const form = $('orderForm');
@@ -61,26 +63,69 @@ function safeImageUrl(value) {
   }
 }
 
-window.renderFlowerCatalog = payload => {
-  if (!payload?.ok || !Array.isArray(payload.products) || !payload.products.length) return;
+function optimizedImageUrl(value, width = 800) {
+  const safe = safeImageUrl(value);
+  if (!safe) return '';
+  const url = new URL(safe);
+  if (url.hostname === 'drive.google.com' && url.pathname === '/thumbnail') {
+    url.searchParams.set('sz', `w${width}`);
+  }
+  return url.href;
+}
+
+function bindProductImages() {
+  document.querySelectorAll('.product-photo img').forEach(img => {
+    const show = () => img.classList.add('is-loaded');
+    if (img.complete && img.naturalWidth) show();
+    else img.addEventListener('load', show, {once: true});
+
+    img.addEventListener('error', () => {
+      if (img.dataset.retried) return;
+      img.dataset.retried = '1';
+      img.src = optimizedImageUrl(img.src, 640);
+    }, {once: true});
+  });
+}
+
+function renderCatalogProducts(products) {
+  const signature = JSON.stringify(products);
+  if (signature === lastCatalogSignature) return;
+  lastCatalogSignature = signature;
+
   const palettes = ['blush','rouge','sunshine','forest','violet'];
   const symbols = ['❀✿❁','✿❀✽','✺✿❀','❈✽❁','❀✾✿'];
-  let cards = payload.products.map((product, index) => {
+  let cards = products.map((product, index) => {
     const name = escapeHtml(product.name);
     const subtitle = escapeHtml(product.subtitle);
     const price = Number(product.price) || 0;
-    const image = safeImageUrl(product.imageUrl);
+    const image = optimizedImageUrl(product.imageUrl);
+    const loading = index < 3 ? 'eager' : 'lazy';
+    const priority = index === 0 ? ' fetchpriority="high"' : '';
     const art = image
-      ? `<div class="product-art product-photo"><img src="${escapeHtml(image)}" alt="${name}" loading="lazy"></div>`
+      ? `<div class="product-art product-photo"><img src="${escapeHtml(image)}" alt="${name}" loading="${loading}" decoding="async"${priority}></div>`
       : `<div class="product-art ${palettes[index % palettes.length]}">${symbols[index % symbols.length].split('').map(x => `<span>${x}</span>`).join('')}</div>`;
     return `<article class="product" data-tags="${categoryTags(product.category)}" data-name="${name}" data-price="${price}">${art}<div class="product-body"><div><p>${subtitle}</p><h3>${name}</h3></div><strong>${price ? 'NT$' + money(price) : '另行報價'}</strong><button>${escapeHtml(product.buttonText || '選這束')}</button></div></article>`;
   }).join('');
   cards += '<article class="product custom-card" data-tags="birthday love opening daily" data-name="花藝師客製" data-price="0"><div class="custom-inner"><span>＋</span><h3>找不到剛好的？</h3><p>告訴我們用途、預算與色系，讓花藝師為你設計。</p><button>開始客製</button></div></article>';
   $('products').innerHTML = cards;
+  bindProductImages();
   bindProductButtons();
   const activeFilter = document.querySelector('[data-filter].active')?.dataset.filter || 'all';
   document.querySelectorAll('.product').forEach(card => card.hidden = activeFilter !== 'all' && !card.dataset.tags.split(' ').includes(activeFilter));
+}
+
+window.renderFlowerCatalog = payload => {
+  if (!payload?.ok || !Array.isArray(payload.products) || !payload.products.length) return;
+  try {
+    localStorage.setItem(PRODUCT_CACHE_KEY, JSON.stringify(payload.products));
+  } catch {}
+  renderCatalogProducts(payload.products);
 };
+
+try {
+  const cachedProducts = JSON.parse(localStorage.getItem(PRODUCT_CACHE_KEY) || 'null');
+  if (Array.isArray(cachedProducts) && cachedProducts.length) renderCatalogProducts(cachedProducts);
+} catch {}
 
 function loadCatalog() {
   if (!FLOWER_ORDER_API) return;
